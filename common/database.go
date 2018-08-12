@@ -6,24 +6,20 @@ import (
 )
 
 type Database struct {
-	*mgo.Session
+	*mgo.Database
 }
 
-var Session *mgo.Session
+var DB *mgo.Database
 
-func Init() *mgo.Session {
+func Init() *mgo.Database {
 	session, err := mgo.Dial("localhost")
 	if err != nil {
 		fmt.Println("db error: ", err)
 	}
-	Session = session
-	return Session
+	DB = session.DB("todo")
+	return DB
 }
 
-func GetDb() *mgo.Session {
-	return Session
+func GetDb() *mgo.Database {
+	return DB
 }
-
-//func GetAllTodos() {
-//	DB.C("TdoList").Find(interface{});
-//}
