@@ -6,8 +6,8 @@ import (
 )
 
 type Todo struct {
-	Name string `json:"name" bson:"name"`
-	Desc string `json:"description" bson:"description"`
+	Name string `json:"name", bson:"name"`
+	Desc string `json:"description", bson:"description"`
 }
 
 func SaveTodo(data interface{}) error {

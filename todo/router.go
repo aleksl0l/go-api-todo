@@ -1,6 +1,9 @@
 package todo
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+)
 
 func TodoRegister(router *gin.RouterGroup) {
 	router.GET("/", TodoRetrive)
@@ -9,6 +12,11 @@ func TodoRegister(router *gin.RouterGroup) {
 }
 
 func TodoRetrive(c *gin.Context) {
+	todos, err := GetAllTodo()
+	if err != nil {
+		c.JSON(http.StatusNotFound, "pakedava")
+	}
+	c.JSON(http.StatusOK, gin.H{"todos": todos})
 
 }
 
