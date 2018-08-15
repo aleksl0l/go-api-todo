@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"todoapi/common"
-	"todoapi/todo"
+	"go-api-todo/common"
+	"go-api-todo/todo"
 )
 
 func main() {
