@@ -23,7 +23,22 @@ func TodoRetrive(c *gin.Context) {
 }
 
 func TodoAdd(c *gin.Context) {
-
+	size_body, error := strconv.Atoi(c.Request.Header.Get("Content-Length"))
+	if error != nil {
+		c.JSON(http.StatusBadRequest, "error in header Content-Length")
+	}
+	buf := make([]byte, size_body)
+	num, _ := c.Request.Body.Read(buf)
+	var todo = &Todo{}
+	error = json.Unmarshal(buf[0:num], todo)
+	if error != nil {
+		c.JSON(http.StatusBadRequest, "can't deserialize json")
+	}
+	error = SaveTodo(todo)
+	if error != nil {
+		c.JSON(http.StatusBadRequest, "can't save that object")
+	}
+	c.JSON(http.StatusOK, "success")
 }
 
 func TodoDelete(c *gin.Context) {
