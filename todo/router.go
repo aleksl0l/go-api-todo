@@ -19,13 +19,13 @@ func TodoRetrive(c *gin.Context) {
 		c.JSON(http.StatusNotFound, "pakedava")
 	}
 	c.JSON(http.StatusOK, gin.H{"todos": todos})
-
 }
 
 func TodoAdd(c *gin.Context) {
 	size_body, error := strconv.Atoi(c.Request.Header.Get("Content-Length"))
 	if error != nil {
 		c.JSON(http.StatusBadRequest, "error in header Content-Length")
+		return
 	}
 	buf := make([]byte, size_body)
 	num, _ := c.Request.Body.Read(buf)
@@ -33,10 +33,12 @@ func TodoAdd(c *gin.Context) {
 	error = json.Unmarshal(buf[0:num], todo)
 	if error != nil {
 		c.JSON(http.StatusBadRequest, "can't deserialize json")
+		return
 	}
 	error = SaveTodo(todo)
 	if error != nil {
 		c.JSON(http.StatusBadRequest, "can't save that object")
+		return
 	}
 	c.JSON(http.StatusOK, "success")
 }

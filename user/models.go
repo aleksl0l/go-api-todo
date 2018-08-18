@@ -11,9 +11,8 @@ type User struct {
 	PasswordHash string `json:"password",bson:"password"`
 }
 
-func SaveUser(data User) error {
+func SaveUser(data interface{}) error {
 	db := common.GetDb()
-
 	err := db.C("user").Insert(data)
 	return err
 }
