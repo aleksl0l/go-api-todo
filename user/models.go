@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-api-todo/common"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type User struct {
@@ -22,6 +23,13 @@ func GetAllUsers() ([]User, error) {
 	var res []User
 	err := db.C("user").Find(nil).All(&res)
 	//fmt.Println(res)
+	return res, err
+}
+
+func GetUserByUsername(username string) (User, error) {
+	db := common.GetDb()
+	var res User
+	err := db.C("user").Find(bson.M{"username": username}).One(&res)
 	return res, err
 }
 

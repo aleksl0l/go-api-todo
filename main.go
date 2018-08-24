@@ -31,6 +31,12 @@ func main() {
 	fmt.Println(u)
 	fmt.Println(u.CheckPassword("puska1"))
 
+	//u := user.User{}
+	//u.SetPassword("puska")
+	//u.Username = "puska"
+	//fmt.Println(u)
+	//fmt.Println(u.CheckPassword("puska1"))
+	//
 	r := gin.Default()
 
 	v1 := r.Group("/api")
