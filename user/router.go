@@ -1,11 +1,9 @@
 package user
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go-api-todo/common"
 	"net/http"
-	"strconv"
 )
 
 func UserRegister(router *gin.RouterGroup) {
@@ -15,23 +13,13 @@ func UserRegister(router *gin.RouterGroup) {
 }
 
 func SignUp(c *gin.Context) {
-	size_body, error := strconv.Atoi(c.Request.Header.Get("Content-Length"))
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "error in header Content-Length")
+	userModelValidator := NewUserModelValidator()
+	if err := userModelValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return
 	}
-	buf := make([]byte, size_body)
-	num, _ := c.Request.Body.Read(buf)
-	var user = &User{}
-	error = json.Unmarshal(buf[:num], user)
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "can't desirealize json")
-		return
-	}
-
-	user.SetPassword(user.PasswordHash)
-	error = SaveUser(user)
-	if error != nil {
+	user := userModelValidator.userModel
+	if err := SaveUser(user); err != nil {
 		c.JSON(http.StatusBadRequest, "can't save that object")
 		return
 	}
@@ -39,23 +27,14 @@ func SignUp(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	size_body, error := strconv.Atoi(c.Request.Header.Get("Content-Length"))
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "error in header Content-Length")
+	userModelValidator := NewUserModelValidator()
+	if err := userModelValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return
 	}
-	buf := make([]byte, size_body)
-	num, _ := c.Request.Body.Read(buf)
-	var user = &User{}
-	error = json.Unmarshal(buf[:num], user)
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "can't desirealize json")
-		return
-	}
+	user := userModelValidator.userModel
 
-	//var user_db = User{}
-	_, error = GetUserByUsername(user.Username)
-	if error != nil {
+	if _, err := GetUserByUsername(user.Username); err != nil {
 		c.JSON(http.StatusBadRequest, "user not found")
 		return
 	}

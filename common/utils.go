@@ -1,7 +1,11 @@
 package common
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"gopkg.in/go-playground/validator.v8"
 	"time"
 )
 
@@ -19,4 +23,30 @@ func GenToken(id string) string {
 	// Sign and get the complete encoded token as a string
 	token, _ := jwt_token.SignedString([]byte(NBSecretPassword))
 	return token
+}
+
+func Bind(c *gin.Context, obj interface{}) error {
+	b := binding.Default(c.Request.Method, c.ContentType())
+	return c.ShouldBindWith(obj, b)
+}
+
+type CommonError struct {
+	Errors map[string]interface{} `json:"errors"`
+}
+
+func NewValidatorError(err error) CommonError {
+	res := CommonError{}
+	res.Errors = make(map[string]interface{})
+	errs := err.(validator.ValidationErrors)
+	for _, v := range errs {
+		// can translate each error one at a time.
+		//fmt.Println("gg",v.NameNamespace)
+		if v.Param != "" {
+			res.Errors[v.Field] = fmt.Sprintf("{%v: %v}", v.Tag, v.Param)
+		} else {
+			res.Errors[v.Field] = fmt.Sprintf("{key: %v}", v.Tag)
+		}
+
+	}
+	return res
 }

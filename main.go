@@ -25,11 +25,7 @@ func main() {
 	//	fmt.Println(todos)
 	//}
 
-	u := user.User{}
-	u.SetPassword("puska")
-	u.Username = "puska"
-	fmt.Println(u)
-	fmt.Println(u.CheckPassword("puska1"))
+	fmt.Println(common.GenToken("test"))
 
 	//u := user.User{}
 	//u.SetPassword("puska")
