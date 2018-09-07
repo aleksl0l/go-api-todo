@@ -37,6 +37,10 @@ func main() {
 
 	v1 := r.Group("/api")
 
+	//authorized := r.Group("/")
+	//authorized.Use(Puk())
+	//todo.TodoRegister(authorized.Group("/todo"))
+
 	todo.TodoRegister(v1.Group("/todo"))
 	user.UserRegister(v1.Group("/user"))
 

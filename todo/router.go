@@ -3,14 +3,15 @@ package todo
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"go-api-todo/user"
 	"net/http"
 	"strconv"
 )
 
 func TodoRegister(router *gin.RouterGroup) {
-	router.GET("/", TodoRetrive)
-	router.POST("/", TodoAdd)
-	router.DELETE("/", TodoDelete)
+	router.GET("/", user.JWTAuthorization(), TodoRetrive)
+	router.POST("/", user.JWTAuthorization(), TodoAdd)
+	router.DELETE("/", user.JWTAuthorization(), TodoDelete)
 }
 
 func TodoRetrive(c *gin.Context) {
@@ -55,10 +56,9 @@ func TodoDelete(c *gin.Context) {
 	error = json.Unmarshal(buf[0:num], todo)
 
 	error = DeleteTodo(todo.Name)
-	//if error != nil {
-	//	c.JSON(http.StatusNotFound, "can't delete todo with name")
-	//	return
-	//}
-	panic("blya")
+	if error != nil {
+		c.JSON(http.StatusNotFound, "can't delete todo with name")
+		return
+	}
 	c.JSON(http.StatusOK, "success")
 }

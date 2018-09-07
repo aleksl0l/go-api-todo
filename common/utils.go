@@ -12,17 +12,18 @@ import (
 const NBSecretPassword = "A String Very Very Very Strong!!@##$!@#$"
 const NBRandomPassword = "A String Very Very Very Niubilty!!@##$!@#4"
 
-// A Util function to generate jwt_token which can be used in the request header
 func GenToken(id string) string {
 	jwt_token := jwt.New(jwt.GetSigningMethod("HS256"))
-	// Set some claims
 	jwt_token.Claims = jwt.MapClaims{
 		"id":  id,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
-	// Sign and get the complete encoded token as a string
 	token, _ := jwt_token.SignedString([]byte(NBSecretPassword))
 	return token
+}
+
+func KeyFunc(token *jwt.Token) (interface{}, error) {
+	return []byte(NBSecretPassword), nil
 }
 
 func Bind(c *gin.Context, obj interface{}) error {
@@ -49,4 +50,12 @@ func NewValidatorError(err error) CommonError {
 
 	}
 	return res
+}
+
+func RenderResponse(c *gin.Context, code int, errors CommonError, data interface{}) {
+	body := gin.H{"data": data}
+	for k, v := range errors.Errors {
+		body[k] = v
+	}
+	c.JSON(code, body)
 }

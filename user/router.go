@@ -8,19 +8,19 @@ import (
 
 func UserRegister(router *gin.RouterGroup) {
 	router.POST("/signUp", SignUp)
-	router.GET("/login", Login)
+	router.POST("/login", Login)
 	router.GET("/logout", Logout)
 }
 
 func SignUp(c *gin.Context) {
 	userModelValidator := NewUserModelValidator()
 	if err := userModelValidator.Bind(c); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		common.RenderResponse(c, http.StatusUnprocessableEntity, common.NewValidatorError(err), nil)
 		return
 	}
 	user := userModelValidator.userModel
 	if err := SaveUser(user); err != nil {
-		c.JSON(http.StatusBadRequest, "can't save that object")
+		common.RenderResponse(c, http.StatusBadRequest, common.CommonError{Errors: gin.H{"errors": "can't save that object"}}, nil)
 		return
 	}
 	c.JSON(http.StatusCreated, "success")
@@ -29,17 +29,18 @@ func SignUp(c *gin.Context) {
 func Login(c *gin.Context) {
 	userModelValidator := NewUserModelValidator()
 	if err := userModelValidator.Bind(c); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		common.RenderResponse(c, http.StatusUnprocessableEntity, common.NewValidatorError(err), nil)
 		return
 	}
 	user := userModelValidator.userModel
 
 	if _, err := GetUserByUsername(user.Username); err != nil {
-		c.JSON(http.StatusBadRequest, "user not found")
+		common.RenderResponse(c, http.StatusBadRequest, common.CommonError{Errors: gin.H{"errors": "user not found"}}, nil)
+		//c.JSON(http.StatusBadRequest, "user not found")
 		return
 	}
 	token := common.GenToken(user.Username)
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	common.RenderResponse(c, http.StatusOK, common.CommonError{Errors: gin.H{"errors": nil}}, gin.H{"token": token})
 }
 
 func Logout(c *gin.Context) {
