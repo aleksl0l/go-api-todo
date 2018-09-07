@@ -19,6 +19,11 @@ func SignUp(c *gin.Context) {
 		return
 	}
 	user := userModelValidator.userModel
+	if _, err := GetUserByUsername(user.Username); err == nil {
+		common.RenderResponse(c, http.StatusBadRequest, common.CommonError{Errors: gin.H{"errors": "user already exist"}}, nil)
+		//c.JSON(http.StatusBadRequest, "user not found")
+		return
+	}
 	if err := SaveUser(user); err != nil {
 		common.RenderResponse(c, http.StatusBadRequest, common.CommonError{Errors: gin.H{"errors": "can't save that object"}}, nil)
 		return

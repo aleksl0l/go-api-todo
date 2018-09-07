@@ -8,8 +8,9 @@ import (
 )
 
 type User struct {
-	Username     string `json:"username",bson:"username"`
-	PasswordHash string `json:"password",bson:"password"`
+	Id           bson.ObjectId `json:"-" bson:"_id"`
+	Username     string        `json:"username",bson:"username"`
+	PasswordHash string        `json:"password",bson:"password"`
 }
 
 func SaveUser(data interface{}) error {
@@ -22,7 +23,6 @@ func GetAllUsers() ([]User, error) {
 	db := common.GetDb()
 	var res []User
 	err := db.C("user").Find(nil).All(&res)
-	//fmt.Println(res)
 	return res, err
 }
 
@@ -44,7 +44,6 @@ func (u *User) SetPassword(password string) error {
 		return errors.New("password should not be empty!")
 	}
 	bytePassword := []byte(password)
-	// Make sure the second param `bcrypt generator cost` between [4, 32)
 	passwordHash, _ := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
 	u.PasswordHash = string(passwordHash)
 	return nil
