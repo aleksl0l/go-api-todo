@@ -3,6 +3,7 @@ package todo
 import (
 	"github.com/globalsign/mgo/bson"
 	"go-api-todo/common"
+	"go-api-todo/user"
 )
 
 type Todo struct {
@@ -21,7 +22,13 @@ func GetAllTodo() ([]Todo, error) {
 	db := common.GetDb()
 	var res []Todo
 	err := db.C("todo").Find(nil).All(&res)
-	//fmt.Println(res)
+	return res, err
+}
+
+func GetAllTodoByUser(user user.User) ([]Todo, error) {
+	db := common.GetDb()
+	var res []Todo
+	err := db.C("todo").Find(bson.M{"_userID": user.Id}).All(&res)
 	return res, err
 }
 

@@ -14,9 +14,11 @@ func TodoRegister(router *gin.RouterGroup) {
 }
 
 func TodoRetrive(c *gin.Context) {
-	todos, err := GetAllTodo()
+	user_res, _ := c.MustGet("user").(user.User)
+	todos, err := GetAllTodoByUser(user_res)
 	if err != nil {
-		c.JSON(http.StatusNotFound, "pakedava")
+		c.JSON(http.StatusNotFound, gin.H{"message": "Not Found"})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"todos": todos})
 }
@@ -33,10 +35,10 @@ func TodoAdd(c *gin.Context) {
 	todo.UserID = user_res.Id
 	err := SaveTodo(todo)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "can't save that object")
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Can't save that object"})
 		return
 	}
-	c.JSON(http.StatusOK, "success")
+	c.JSON(http.StatusOK, nil)
 }
 
 func TodoDelete(c *gin.Context) {
@@ -52,5 +54,5 @@ func TodoDelete(c *gin.Context) {
 		c.JSON(http.StatusNotFound, "can't delete todo with name")
 		return
 	}
-	c.JSON(http.StatusOK, "success")
+	c.JSON(http.StatusOK, nil)
 }
