@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-	"gopkg.in/mgo.v2"
+	"github.com/globalsign/mgo"
 )
 
 type Database struct {

@@ -10,7 +10,8 @@ import (
 )
 
 const NBSecretPassword = "A String Very Very Very Strong!!@##$!@#$"
-const NBRandomPassword = "A String Very Very Very Niubilty!!@##$!@#4"
+
+//const NBRandomPassword = "A String Very Very Very Niubilty!!@##$!@#4"
 
 func GenToken(id string) string {
 	jwt_token := jwt.New(jwt.GetSigningMethod("HS256"))
@@ -40,21 +41,23 @@ func NewValidatorError(err error) CommonError {
 	res.Errors = make(map[string]interface{})
 	errs := err.(validator.ValidationErrors)
 	for _, v := range errs {
-		// can translate each error one at a time.
-		//fmt.Println("gg",v.NameNamespace)
 		if v.Param != "" {
 			res.Errors[v.Field] = fmt.Sprintf("{%v: %v}", v.Tag, v.Param)
 		} else {
 			res.Errors[v.Field] = fmt.Sprintf("{key: %v}", v.Tag)
 		}
-
 	}
 	return res
 }
 
-func RenderResponse(c *gin.Context, code int, errors CommonError, data interface{}) {
+func RenderResponse(c *gin.Context, code int, errors interface{}, data interface{}) {
+	if errors == nil {
+		errors = CommonError{Errors: gin.H{"errors": nil}}
+	}
+	err := errors.(CommonError)
+
 	body := gin.H{"data": data}
-	for k, v := range errors.Errors {
+	for k, v := range err.Errors {
 		body[k] = v
 	}
 	c.JSON(code, body)

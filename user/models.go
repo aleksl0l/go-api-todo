@@ -2,15 +2,15 @@ package user
 
 import (
 	"errors"
+	"github.com/globalsign/mgo/bson"
 	"go-api-todo/common"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type User struct {
-	Id           bson.ObjectId `json:"-" bson:"_id"`
-	Username     string        `json:"username",bson:"username"`
-	PasswordHash string        `json:"password",bson:"password"`
+	Id           bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Username     string        `json:"username" bson:"username"`
+	PasswordHash string        `json:"password" bson:"password"`
 }
 
 func SaveUser(data interface{}) error {
@@ -19,12 +19,12 @@ func SaveUser(data interface{}) error {
 	return err
 }
 
-func GetAllUsers() ([]User, error) {
-	db := common.GetDb()
-	var res []User
-	err := db.C("user").Find(nil).All(&res)
-	return res, err
-}
+//func GetAllUsers() ([]User, error) {
+//	db := common.GetDb()
+//	var res []User
+//	err := db.C("user").Find(nil).All(&res)
+//	return res, err
+//}
 
 func GetUserByUsername(username string) (User, error) {
 	db := common.GetDb()

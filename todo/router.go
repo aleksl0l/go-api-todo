@@ -1,11 +1,10 @@
 package todo
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"go-api-todo/common"
 	"go-api-todo/user"
 	"net/http"
-	"strconv"
 )
 
 func TodoRegister(router *gin.RouterGroup) {
@@ -23,21 +22,17 @@ func TodoRetrive(c *gin.Context) {
 }
 
 func TodoAdd(c *gin.Context) {
-	size_body, error := strconv.Atoi(c.Request.Header.Get("Content-Length"))
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "error in header Content-Length")
+	todoModelValidator := NewTodoModelValidator()
+	if err := todoModelValidator.Bind(c); err != nil {
+		common.RenderResponse(c, http.StatusUnprocessableEntity, common.NewValidatorError(err), nil)
 		return
 	}
-	buf := make([]byte, size_body)
-	num, _ := c.Request.Body.Read(buf)
-	var todo = &Todo{}
-	error = json.Unmarshal(buf[0:num], todo)
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "can't deserialize json")
-		return
-	}
-	error = SaveTodo(todo)
-	if error != nil {
+	todo := todoModelValidator.todoModel
+
+	user_res, _ := c.MustGet("user").(user.User)
+	todo.UserID = user_res.Id
+	err := SaveTodo(todo)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, "can't save that object")
 		return
 	}
@@ -45,18 +40,15 @@ func TodoAdd(c *gin.Context) {
 }
 
 func TodoDelete(c *gin.Context) {
-	size_body, error := strconv.Atoi(c.Request.Header.Get("Content-Length"))
-	if error != nil {
-		c.JSON(http.StatusBadRequest, "error in header Content-Length")
+	todoModelValidator := NewTodoModelValidator()
+	if err := todoModelValidator.Bind(c); err != nil {
+		common.RenderResponse(c, http.StatusUnprocessableEntity, common.NewValidatorError(err), nil)
 		return
 	}
-	buf := make([]byte, size_body)
-	num, _ := c.Request.Body.Read(buf)
-	var todo = &Todo{}
-	error = json.Unmarshal(buf[0:num], todo)
+	todo := todoModelValidator.todoModel
 
-	error = DeleteTodo(todo.Name)
-	if error != nil {
+	err := DeleteTodo(todo.Name)
+	if err != nil {
 		c.JSON(http.StatusNotFound, "can't delete todo with name")
 		return
 	}

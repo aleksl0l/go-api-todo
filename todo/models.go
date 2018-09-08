@@ -1,13 +1,14 @@
 package todo
 
 import (
+	"github.com/globalsign/mgo/bson"
 	"go-api-todo/common"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type Todo struct {
-	Name string `json:"name",bson:"name"`
-	Desc string `json:"description",bson:"description"`
+	Name   string        `json:"name" bson:"name"`
+	Desc   string        `json:"description" bson:"description"`
+	UserID bson.ObjectId `json:"-" bson:"_userID"`
 }
 
 func SaveTodo(data interface{}) error {

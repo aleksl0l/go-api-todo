@@ -44,6 +44,11 @@ func JWTAuthorization() gin.HandlerFunc {
 		fmt.Println(claims["id"], reflect.TypeOf(claims["id"]))
 		username := claims["id"].(string)
 		user, err := GetUserByUsername(username)
+		if err != nil {
+			c.JSON(http.StatusForbidden, gin.H{"message": "User not found"})
+			c.Abort()
+			return
+		}
 
 		c.Set("user", user)
 		c.Next()
