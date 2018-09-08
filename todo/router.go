@@ -8,9 +8,9 @@ import (
 )
 
 func TodoRegister(router *gin.RouterGroup) {
-	router.GET("/", user.JWTAuthorization(), TodoRetrive)
-	router.POST("/", user.JWTAuthorization(), TodoAdd)
-	router.DELETE("/", user.JWTAuthorization(), TodoDelete)
+	router.GET("/", TodoRetrive)
+	router.POST("/", TodoAdd)
+	router.DELETE("/", TodoDelete)
 }
 
 func TodoRetrive(c *gin.Context) {
@@ -20,7 +20,7 @@ func TodoRetrive(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Not Found"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"todos": todos})
+	c.JSON(http.StatusOK, gin.H{"data": todos})
 }
 
 func TodoAdd(c *gin.Context) {
@@ -51,7 +51,7 @@ func TodoDelete(c *gin.Context) {
 
 	err := DeleteTodo(todo.Name)
 	if err != nil {
-		c.JSON(http.StatusNotFound, "can't delete todo with name")
+		c.JSON(http.StatusNotFound, gin.H{"message": "Todo not found"})
 		return
 	}
 	c.JSON(http.StatusOK, nil)

@@ -15,7 +15,10 @@ func main() {
 
 	v1 := r.Group("/api")
 
-	todo.TodoRegister(v1.Group("/todo"))
+	todo_group := v1.Group("/todo")
+	todo_group.Use(user.JWTAuthorization())
+
+	todo.TodoRegister(todo_group)
 	user.UserRegister(v1.Group("/user"))
 
 	r.Run()
